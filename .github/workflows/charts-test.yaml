@@ -195,10 +195,14 @@ jobs:
 
       - name: Run chart-testing (install)
         run: |
+          INSTALL_TIMEOUT=""
+          if [ -f "${{ matrix.chart }}/ci/install-timeout" ]; then
+            INSTALL_TIMEOUT="--helm-extra-args '--timeout $(head -1 "${{ matrix.chart }}/ci/install-timeout" | cut -c -4)'";
+          fi
           if [ -d "${{ matrix.chart }}/test-chart" ]; then
-            ct install --config ".github/ct-install.yaml" --charts "${{ matrix.chart }}/test-chart"
+            ct install --config ".github/ct-install.yaml" $INSTALL_TIMEOUT --charts "${{ matrix.chart }}/test-chart"
           else
-            ct install --config ".github/ct-install.yaml" --charts "${{ matrix.chart }}"
+            ct install --config ".github/ct-install.yaml" $INSTALL_TIMEOUT --charts "${{ matrix.chart }}"
           fi
 
   install-charts2:
